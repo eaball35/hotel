@@ -1,7 +1,4 @@
 require_relative 'test_helper'
-require_relative '../lib/reservation'
-require_relative '../lib/room'
-require_relative '../lib/date_checker'
 
 describe 'reservation tests' do
   it 'should create a new insance of reservation with given room and booking date ranges' do

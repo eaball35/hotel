@@ -1,5 +1,4 @@
 require_relative 'test_helper'
-require_relative '../lib/room'
 
 describe 'room tests' do
   it 'should create new instance of room with given roomnumber and cost' do
