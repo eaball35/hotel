@@ -1,6 +1,6 @@
-require_relative 'Room'
-require_relative 'Reservation'
-require_relative 'Date_Checker'
+require_relative 'room'
+require_relative 'reservation'
+require_relative 'date_checker'
 
 class ReservationBooker
     
@@ -35,8 +35,8 @@ class ReservationBooker
       return nil
     end
 
-    def book_reservation(room, booking_date_range)
-      if room.class != Room
+    def book_reservation(avaible_room, booking_date_range)
+      if avaible_room.class != Room
         raise ArgumentError.new("Room input isn't valid")
       elsif booking_date_range.class != Array
         raise ArgumentError.new("Booking dates input isn't valid")
@@ -44,11 +44,10 @@ class ReservationBooker
         raise ArgumentError.new("Booking dates input isn't valid - dates aren't Dates")
       end
       
-
-      reservation = Reservation.new(room, booking_date_range)
+      reservation = Reservation.new(avaible_room, booking_date_range)
       @reservations << reservation
-      room.reservations << reservation
-      room.unavailable_dates.concat(booking_date_range)
+      avaible_room.reservations << reservation
+      avaible_room.unavailable_dates.concat(booking_date_range)
       return reservation
     end
 end

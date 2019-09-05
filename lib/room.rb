@@ -1,7 +1,3 @@
-require_relative 'date_checker'
-require_relative 'reservation'
-require_relative 'reservation_booker'
-
 class Room
   
   attr_reader :room_number, :cost

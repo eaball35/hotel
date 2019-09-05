@@ -51,7 +51,7 @@ describe 'reservation_booker tests' do
       booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 9 2019').booking_date_range
       
       first_available_room = hotel.find_first_available_room(booking_dates)
-      first_reservation = hotel.book_reservation(first_available_room, booking_dates)
+      hotel.book_reservation(first_available_room, booking_dates)
 
       expect(first_available_room).must_be_instance_of Room
 
@@ -68,7 +68,7 @@ describe 'reservation_booker tests' do
       booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 9 2019').booking_date_range
       
       available_room = hotel.find_first_available_room(booking_dates)
-      reservation = hotel.book_reservation(available_room, booking_dates)
+      hotel.book_reservation(available_room, booking_dates)
 
       next_available_room = hotel.find_first_available_room(booking_dates)
       expect(next_available_room).must_be_nil
@@ -93,7 +93,7 @@ describe 'reservation_booker tests' do
       booking_dates2 = DateChecker.new('Apr, 4 2019', 'Apr, 7 2019').booking_date_range
       
       first_available_room = hotel.find_first_available_room(booking_dates1)
-      first_reservation = hotel.book_reservation(first_available_room, booking_dates1)
+      hotel.book_reservation(first_available_room, booking_dates1)
 
       second_available_room = hotel.find_first_available_room(booking_dates2)
       
@@ -103,8 +103,74 @@ describe 'reservation_booker tests' do
   
   end
 
-
   describe 'book_reservation tests' do
+
+    it 'raises error if room input is invalid'do
+      hotel = ReservationBooker.new
+      hotel.add_rooms(1,200)
+      booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      
+      expect{hotel.book_reservation("room", booking_dates)}.must_raise ArgumentError
+    end
+
+    it 'raises error if booking dates input is invalid'do
+      hotel = ReservationBooker.new
+      hotel.add_rooms(1,200)
+      booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      first_available_room = hotel.find_first_available_room(booking_dates)
+
+      expect{hotel.book_reservation(first_available_room, "booking_dates")}.must_raise ArgumentError
+    end
+
+    it 'raises error if booking dates input not contains Dates' do
+      hotel = ReservationBooker.new
+      hotel.add_rooms(1,200)
+      booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      first_available_room = hotel.find_first_available_room(booking_dates)
+
+      expect{hotel.book_reservation(first_available_room, ['Apr, 1 2019', 'Apr, 4 2019'])}.must_raise ArgumentError
+    end
+
+    it 'returns new reservation given available room and booking dates' do
+      hotel = ReservationBooker.new
+      hotel.add_rooms(1,200)
+      booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      first_available_room = hotel.find_first_available_room(booking_dates)
+      reservation = hotel.book_reservation(first_available_room, booking_dates)
+
+      expect(reservation).must_be_instance_of Reservation
+      expect(reservation.room).must_equal first_available_room
+      expect(reservation.booking_date_range).must_equal booking_dates
+    end
+
+    
+    it 'new reservation should be added to rooms list of reservations' do
+      hotel = ReservationBooker.new
+      hotel.add_rooms(1,200)
+      booking_dates1 = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      booking_dates2 = DateChecker.new('Apr, 6 2019', 'Apr, 10 2019').booking_date_range
+      
+      first_available_room = hotel.find_first_available_room(booking_dates1)
+      reservation1 = hotel.book_reservation(first_available_room, booking_dates1)
+      
+      second_available_room = hotel.find_first_available_room(booking_dates2)
+      reservation2 = hotel.book_reservation(second_available_room, booking_dates2)
+
+      expect(second_available_room.reservations.length).must_equal 2
+      expect(second_available_room.reservations[0]).must_equal reservation1
+      expect(second_available_room.reservations[1]).must_equal reservation2
+    end
+
+    it 'new reservation booking dates should be added to rooms unavailable dates' do
+      hotel = ReservationBooker.new
+      hotel.add_rooms(1,200)
+      booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      
+      first_available_room = hotel.find_first_available_room(booking_dates)
+      reservation = hotel.book_reservation(first_available_room, booking_dates)
+
+      expect(first_available_room.unavailable_dates).must_equal booking_dates
+    end
 
   end
 end
