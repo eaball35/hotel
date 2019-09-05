@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-describe 'reservation_booker tests' do
+describe 'reservation_booker' do
     describe 'initialize' do
       it 'new instance of Reservation_Booker is created with empty rooms and reservations' do
           reservation_booker_test = ReservationBooker.new
@@ -13,7 +13,7 @@ describe 'reservation_booker tests' do
       end
     end
 
-    describe 'add_rooms tests' do
+    describe 'add_rooms' do
     
       it 'raise error if num_rooms is invalid' do
         reservation_booker_test = ReservationBooker.new
@@ -38,7 +38,7 @@ describe 'reservation_booker tests' do
     end
   end
 
-  describe 'find_first_available_room tests' do
+  describe 'find_first_available_room' do
     it 'raises error if no rooms added' do
       reservation_booker_test = ReservationBooker.new
       new_booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 9 2019').booking_date_range
@@ -103,7 +103,7 @@ describe 'reservation_booker tests' do
   
   end
 
-  describe 'book_reservation tests' do
+  describe 'book_reservation' do
 
     it 'raises error if room input is invalid'do
       hotel = ReservationBooker.new
@@ -171,6 +171,41 @@ describe 'reservation_booker tests' do
 
       expect(first_available_room.unavailable_dates).must_equal booking_dates
     end
-
   end
+
+  describe 'find_reservations_bydate' do
+    it 'returns list of reservations on given date' do
+      hotel = ReservationBooker.new
+        hotel.add_rooms(2,200)
+        booking_dates = DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+        
+        first_available_room = hotel.find_first_available_room(booking_dates)
+        reservation1 = hotel.book_reservation(first_available_room, booking_dates)
+        
+        second_available_room = hotel.find_first_available_room(booking_dates)
+        reservation2 = hotel.book_reservation(second_available_room, booking_dates)
+
+        testdate = Date.parse('Apr, 1 2019')
+        reservations = hotel.find_reservations_bydate(testdate)
+        expect(reservations.length).must_equal 2
+        expect(reservations).must_include reservation1
+        expect(reservations).must_include reservation2
+    end
+
+    it 'returns nil if there are no reservations yet' do
+      hotel = ReservationBooker.new
+      testdate = Date.parse('Apr, 1 2019')
+      reservations = hotel.find_reservations_bydate(testdate)
+
+      expect(reservations).must_be_nil
+    end
+
+    it 'raises error if date input is invalid' do
+      hotel = ReservationBooker.new
+      testdate = 'Apr, 1 2019'
+      
+      expect{hotel.find_reservations_bydate(testdate)}.must_raise ArgumentError
+    end
+  end
+
 end

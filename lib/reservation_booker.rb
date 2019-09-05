@@ -52,7 +52,10 @@ class ReservationBooker
     end
 
     def find_reservations_bydate(date)
-      #need to finish this!
+      raise ArgumentError.new("invalid input date") if date.class != Date
+      return nil if @reservations.empty?
+      
+      found_reservations = []
       @reservations.each do |reservation|
         reservation.booking_date_range.each do |booking_date|
           if booking_date == date
