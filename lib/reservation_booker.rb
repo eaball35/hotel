@@ -50,4 +50,17 @@ class ReservationBooker
       avaible_room.unavailable_dates.concat(booking_date_range)
       return reservation
     end
+
+    def find_reservations_bydate(date)
+      #need to finish this!
+      @reservations.each do |reservation|
+        reservation.booking_date_range.each do |booking_date|
+          if booking_date == date
+            found_reservations << reservation
+            break
+          end
+        end
+      end
+      return found_reservations
+    end
 end
