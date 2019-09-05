@@ -1,7 +1,22 @@
 require_relative 'test_helper'
-
+require 'date'
 
 describe 'date_checker tests' do
+
+    let (:date1)  {
+        DateChecker.new("Jan 1, 2019", "Jan 4, 2019")
+      }
+    let (:start1)  {
+        date1.start_date
+      }
+    let (:end1)  {
+        date1.end_date
+    }
+    let (:booking_date_range1)  {
+        date1.booking_date_range
+    }
+
+
     it 'should raise error if end date or start date are nil' do
         expect{DateChecker.new(nil, "Jan 4, 2019")}.must_raise ArgumentError
         expect{DateChecker.new("Jan 1, 2019", nil)}.must_raise ArgumentError
@@ -12,22 +27,20 @@ describe 'date_checker tests' do
     end
 
     it 'instance end and start date variables should be instance of Time' do
-        testdate = DateChecker.new("Jan 1, 2019", "Jan 4, 2019")
-        
-        expect(testdate.start_date).must_be_instance_of Date
-        expect(testdate.end_date).must_be_instance_of Date
+        expect(start1).must_be_instance_of Date
+        expect(end1).must_be_instance_of Date
     end
 
     it 'booking date range should include all date within start/end, not including last day' do
-        testdate = DateChecker.new("Jan 1, 2019", "Jan 4, 2019")
-        start_date = testdate.start_date
-        end_date = testdate.end_date
-        booking_date_range = testdate.booking_date_range
-        
-        expect(booking_date_range).must_be_instance_of Array
-        expect(booking_date_range.length).must_equal 3
-        expect(booking_date_range[0]).must_be_instance_of Date
-        expect(booking_date_range[0]).must_equal start_date
-        expect(booking_date_range[-1]).must_equal (end_date-1)
+        expect(booking_date_range1).must_be_instance_of Array
+        expect(booking_date_range1.length).must_equal 3
+        expect(booking_date_range1[0]).must_be_instance_of Date
+        expect(booking_date_range1[0]).must_equal start1
+        expect(booking_date_range1[-1]).must_equal (end1 - 1)
+    end
+
+    it 'booking date range should not include last input date' do
+        last_day = Date.parse("Jan 4, 2019")
+        expect(booking_date_range1).wont_include last_day
     end
 end

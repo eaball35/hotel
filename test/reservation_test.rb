@@ -1,22 +1,26 @@
 require_relative 'test_helper'
 
 describe 'reservation tests' do
-  it 'should create a new insance of reservation with given room and booking date ranges' do
-    room = Room.new(1,200)
-    booking_dates = DateChecker.new('Jan, 1, 2019', 'Jan 4, 2019').booking_date_range
-    reservation = Reservation.new(room, booking_dates)
+  
+  let (:room1)  {
+    Room.new(1,200) 
+  }
+  
+  let (:booking_dates1)  {
+    DateChecker.new('Jan, 1, 2019', 'Jan 4, 2019').booking_date_range 
+  }
 
-    expect(reservation).must_be_instance_of Reservation
-    expect(reservation.room).must_equal room
-    expect(reservation.booking_date_range).must_equal booking_dates
+  let (:reservation1)  {
+    Reservation.new(room1, booking_dates1) 
+  }
+
+  it 'should create a new insance of reservation with given room and booking date ranges' do
+    expect(reservation1).must_be_instance_of Reservation
+    expect(reservation1.room).must_equal room1
+    expect(reservation1.booking_date_range).must_equal booking_dates1
   end
 
   it 'should calculate reservation price using room and dates' do
-    room = Room.new(1,200)
-    booking_dates = DateChecker.new('Jan, 1, 2019', 'Jan 4, 2019').booking_date_range
-    reservation = Reservation.new(room, booking_dates)
-
-    expect(reservation.price).must_equal 600
+    expect(reservation1.price).must_equal 600
   end
-
 end

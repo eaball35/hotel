@@ -1,40 +1,42 @@
 require_relative 'test_helper'
 
 describe 'reservation_booker' do
+  let (:hotel)  {
+    ReservationBooker.new
+  }
+  let (:hotel_rooms)  {
+    hotel.rooms
+  }
+  let (:hotel_reservations)  {
+    hotel.reservations
+  }
+  
+
     describe 'initialize' do
       it 'new instance of Reservation_Booker is created with empty rooms and reservations' do
-          reservation_booker_test = ReservationBooker.new
-          rooms = reservation_booker_test.rooms
-          reservations = reservation_booker_test.reservations
-
-          expect(reservation_booker_test).must_be_instance_of ReservationBooker
-          expect(rooms).must_equal []
-          expect(reservations).must_equal []
+          expect(hotel).must_be_instance_of ReservationBooker
+          expect(hotel_rooms).must_equal []
+          expect(hotel_reservations).must_equal []
       end
     end
 
     describe 'add_rooms' do
     
       it 'raise error if num_rooms is invalid' do
-        reservation_booker_test = ReservationBooker.new
-        
-        expect{reservation_booker_test.add_rooms("45",200)}.must_raise ArgumentError
-        expect{reservation_booker_test.add_rooms([],200)}.must_raise ArgumentError
+        expect{hotel.add_rooms("45",200)}.must_raise ArgumentError
+        expect{hotel.add_rooms([],200)}.must_raise ArgumentError
       end
 
-      it 'raise error if cost is invalid' do
-        reservation_booker_test = ReservationBooker.new
-        
-        expect{reservation_booker_test.add_rooms(2,"200")}.must_raise ArgumentError
-        expect{reservation_booker_test.add_rooms([2],[200])}.must_raise ArgumentError
+      it 'raise error if cost is invalid' do    
+        expect{hotel.add_rooms(2,"200")}.must_raise ArgumentError
+        expect{hotel.add_rooms([2],[200])}.must_raise ArgumentError
       end
 
       it 'adds new instances of Room with given cost for number of rooms times to @rooms variable' do
-        reservation_booker_test = ReservationBooker.new
-        reservation_booker_test.add_rooms(20,200)
+        hotel.add_rooms(20,200)
 
-        expect(reservation_booker_test.rooms[0]).must_be_instance_of Room
-        expect(reservation_booker_test.rooms.length).must_equal 20
+        expect(hotel.rooms[0]).must_be_instance_of Room
+        expect(hotel.rooms.length).must_equal 20
     end
   end
 

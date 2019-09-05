@@ -1,14 +1,15 @@
 require_relative 'test_helper'
 
 describe 'room tests' do
+  
+  let (:room1)  {
+    Room.new(1,200) 
+  }
+  
   it 'should create new instance of room with given roomnumber and cost' do
-    roomtest = Room.new(1,200)
-    room_number = roomtest.room_number
-    room_cost =  roomtest.cost
-    
-    expect(roomtest).must_be_instance_of Room
-    expect(room_number).must_equal 1
-    expect(room_cost).must_equal 200
+    expect(room1).must_be_instance_of Room
+    expect(room1.room_number).must_equal 1
+    expect(room1.cost).must_equal 200
   end
 
   it 'should raise error if room number is invalid' do
