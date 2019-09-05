@@ -13,7 +13,6 @@ describe 'reservation_booker' do
   let (:new_booking_dates)  {
     DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
   }
-  
 
     describe 'initialize' do
       it 'new instance of Reservation_Booker is created with empty rooms and reservations' do
@@ -132,7 +131,6 @@ describe 'reservation_booker' do
       expect(new_reservation.booking_date_range).must_equal new_booking_dates
     end
 
-    
     it 'new reservation should be added to rooms list of reservations' do
       hotel.add_rooms(1,200)
       new_booking_dates2 = DateChecker.new('Apr, 6 2019', 'Apr, 10 2019').booking_date_range
@@ -190,5 +188,30 @@ describe 'reservation_booker' do
       expect{hotel.find_reservations_bydate(nil)}.must_raise ArgumentError
     end
   end
+
+  describe 'find_available_rooms_bydate' do
+    it 'finds list of avaible rooms by date' do
+      hotel.add_rooms(2,200)
+      
+      available_room1 = hotel.find_first_available_room(new_booking_dates)
+      eservation1 = hotel.book_reservation(available_room1, new_booking_dates)
+        
+      available_room2 = hotel.find_first_available_room(new_booking_dates)
+      reservation2 = hotel.book_reservation(available_room2, new_booking_dates)
+
+      input_date = Date.parse('Apr, 1 2019')
+      found_rooms = hotel.find_available_rooms_bydate(input_date)
+
+      expect(found_rooms.length).must_equal 2
+      expect(found_rooms).must_include available_room1
+      expect(found_rooms).must_include available_room2
+    end
   
+  end
+
+
+
+
+
+
 end

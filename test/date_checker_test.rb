@@ -16,7 +16,6 @@ describe 'date_checker tests' do
         date1.booking_date_range
     }
 
-
     it 'should raise error if end date or start date are nil' do
         expect{DateChecker.new(nil, "Jan 4, 2019")}.must_raise ArgumentError
         expect{DateChecker.new("Jan 1, 2019", nil)}.must_raise ArgumentError

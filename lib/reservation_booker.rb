@@ -54,7 +54,7 @@ class ReservationBooker
     def find_reservations_bydate(date)
       raise ArgumentError.new("invalid input date") if date.class != Date
       return nil if @reservations.empty?
-      
+
       found_reservations = []
       @reservations.each do |reservation|
         reservation.booking_date_range.each do |booking_date|
@@ -66,4 +66,24 @@ class ReservationBooker
       end
       return found_reservations
     end
+
+    def find_available_rooms_bydate(date)
+      #NOT FINISHED!
+      raise ArgumentError.new("No rooms added yet") if @rooms == []
+
+      found_rooms = []
+
+      @rooms.each do |room|
+        if room.reservations.empty? || (room.unavailable_dates & booking_date_range).empty?
+          found_rooms << room 
+        end
+      end
+      
+      if found_rooms.empty? 
+        return nil
+      else
+        return found_rooms
+      end
+    end
+
 end
