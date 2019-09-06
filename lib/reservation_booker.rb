@@ -39,7 +39,9 @@ class ReservationBooker
 
 # books a new reservation given an available room and booking date range
 # adds the new reservation to list of hotel reservations, the rooms reservations list, & adds the booking dates range to the rooms unavaible dates
-    def book_reservation(avaible_room, booking_date_range)
+    def book_reservation(booking_date_range)
+      avaible_room = find_first_available_room(booking_date_range)
+      
       if avaible_room.class != Room
         raise ArgumentError.new("Room input isn't valid")
       elsif booking_date_range.class != Array
