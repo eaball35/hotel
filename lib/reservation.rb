@@ -4,6 +4,6 @@ class Reservation
   def initialize(room, booking_date_range)
     @room = room
     @booking_date_range = booking_date_range
-    @price = room.cost * booking_date_range.length
+    @price = @room.cost * (booking_date_range.length)
   end
 end
