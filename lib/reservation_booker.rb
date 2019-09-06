@@ -42,7 +42,9 @@ class ReservationBooker
     def book_reservation(booking_date_range)
       avaible_room = find_first_available_room(booking_date_range)
       
-      if avaible_room.class != Room
+      if avaible_room == nil
+        raise ArgumentError.new("No rooms are available")  
+      elsif avaible_room.class != Room
         raise ArgumentError.new("Room input isn't valid")
       elsif booking_date_range.class != Array
         raise ArgumentError.new("Booking dates input isn't valid")
