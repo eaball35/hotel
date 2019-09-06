@@ -19,7 +19,7 @@ describe 'reservation_booker' do
   }
 
     describe 'initialize' do
-      it 'new instance of Reservation_Booker is created with empty rooms and reservations' do
+      it 'new default instance of Reservation_Booker is created with empty rooms and reservations' do
           expect(reservation_booker).must_be_instance_of ReservationBooker
           expect(hotel_rooms).must_equal []
           expect(hotel_reservations).must_equal []

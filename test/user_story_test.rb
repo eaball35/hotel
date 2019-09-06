@@ -1,5 +1,4 @@
 require_relative 'test_helper'
-require 'awesome_print'
 
 describe 'user stories' do
   let (:hotel)  {
