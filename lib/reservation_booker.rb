@@ -100,4 +100,11 @@ class ReservationBooker
       end
     end
 
+    def find_totalcost_byreservation(reservation)
+      raise ArgumentError.new('Invalid reservation input') if reservation.class != Reservation
+      raise ArgumentError.new('Not a current reservation') if !@reservations.include?(reservation)
+
+      return reservation.price
+    end
+
 end

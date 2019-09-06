@@ -154,6 +154,15 @@ describe 'reservation_booker' do
 
       expect(available_room.unavailable_dates).must_equal new_booking_dates
     end
+
+    it 'raises error if inputed room already has reservation on inputed dates' do
+      hotel.add_rooms(1,200)
+      
+      available_room = hotel.find_first_available_room(new_booking_dates)
+      hotel.book_reservation(available_room, new_booking_dates)
+      
+      expect{hotel.book_reservation(available_room, new_booking_dates)}.must_raise ArgumentError
+    end
   end
 
   describe 'find_reservations_bydate' do
@@ -190,28 +199,59 @@ describe 'reservation_booker' do
   end
 
   describe 'find_available_rooms_bydate' do
-    it 'finds list of avaible rooms by date' do
+    let (:input_date)  {
+      Date.parse('Apr, 2 2019')
+    }
+    
+    it 'raises error if no rooms added yet' do
+      expect{hotel.find_available_rooms_bydate(input_date)}.must_raise ArgumentError
+    end
+
+    it 'raises error if date input is invalid' do
       hotel.add_rooms(2,200)
+      expect{hotel.find_available_rooms_bydate('input_date')}.must_raise ArgumentError
+      expect{hotel.find_available_rooms_bydate([input_date, input_date])}.must_raise ArgumentError
+      expect{hotel.find_available_rooms_bydate('Apr 1, 2019')}.must_raise ArgumentError
+    end
+    
+    it 'finds list of avaible rooms by date, ignoring unavaible rooms' do
+      hotel.add_rooms(20,200)
       
       available_room1 = hotel.find_first_available_room(new_booking_dates)
-      eservation1 = hotel.book_reservation(available_room1, new_booking_dates)
-        
-      available_room2 = hotel.find_first_available_room(new_booking_dates)
-      reservation2 = hotel.book_reservation(available_room2, new_booking_dates)
+      hotel.book_reservation(available_room1, new_booking_dates)
 
-      input_date = Date.parse('Apr, 1 2019')
       found_rooms = hotel.find_available_rooms_bydate(input_date)
 
-      expect(found_rooms.length).must_equal 2
-      expect(found_rooms).must_include available_room1
-      expect(found_rooms).must_include available_room2
+      expect(found_rooms).must_be_instance_of Array
+      expect(found_rooms.length).must_equal 19
+      expect(found_rooms[0]).must_be_instance_of Room
+      expect(found_rooms).wont_include available_room1
     end
-  
   end
 
+  describe 'find_totalcost_byreservation' do
+    it 'returns total cost for given reservation' do
+      hotel.add_rooms(2,200)
+      available_room = hotel.find_first_available_room(new_booking_dates)
+      reservation = hotel.book_reservation(available_room, new_booking_dates)
 
+      total_cost = hotel.find_totalcost_byreservation(reservation)
 
+      expect(total_cost).must_equal 600
+    end
 
+    it 'raises an error if reservation is invalid' do
+      expect{hotel.find_totalcost_byreservation('reservation')}.must_raise ArgumentError
+      expect{hotel.find_totalcost_byreservation(nil)}.must_raise ArgumentError
+    end
 
+    it 'raises an error if reservation doesnt exist in list of hotel reservations' do
+      hotel.add_rooms(1,200)
+      reservation = Reservation.new(hotel_rooms[0], new_booking_dates)
+
+      expect{hotel.find_totalcost_byreservation(reservation)}.must_raise ArgumentError
+    end
+
+  end
 
 end
