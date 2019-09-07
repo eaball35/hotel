@@ -14,10 +14,9 @@ class Hotel
     @cost = cost
 
     if num_rooms > 0
-      num_rooms.times { @rooms << Room.new(cost) }
+      num_rooms.times { rooms << Room.new(cost) }
     end 
-    
-    @reservation_booker = ReservationBooker.new
+    @reservation_booker = ReservationBooker.new(@rooms)
   end
     
     # adds additional rooms to booker - input number of new rooms and cost per room
@@ -29,9 +28,6 @@ class Hotel
     num_rooms.times do
       new_room = Room.new(cost)
       @rooms << new_room
-      @reservation_booker.rooms << new_room
     end
   end                  
 end
-
-  

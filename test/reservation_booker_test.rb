@@ -177,20 +177,15 @@ describe 'reservation_booker' do
     end
   end
 
-  describe 'find_available_rooms_bydate' do
-    let (:input_date)  {
-      Date.parse('Apr, 2 2019')
-    }
-    
+  describe 'find_available_rooms_bydates' do
     it 'raises error if no rooms added yet' do
-      expect{reservation_booker.find_available_rooms_bydate(input_date)}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms_bydates(new_booking_dates)}.must_raise ArgumentError
     end
 
     it 'raises error if date input is invalid' do
       hotel.add_rooms(2,200)
-      expect{reservation_booker.find_available_rooms_bydate('input_date')}.must_raise ArgumentError
-      expect{reservation_booker.find_available_rooms_bydate([input_date, input_date])}.must_raise ArgumentError
-      expect{reservation_booker.find_available_rooms_bydate('Apr 1, 2019')}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms_bydates('new_booking_dates')}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms_bydates('Apr 1, 2019')}.must_raise ArgumentError
     end
     
     it 'finds list of avaible rooms by date, ignoring unavaible rooms' do
@@ -198,7 +193,7 @@ describe 'reservation_booker' do
       
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
 
-      found_rooms = reservation_booker.find_available_rooms_bydate(input_date)
+      found_rooms = reservation_booker.find_available_rooms_bydates(new_booking_dates)
 
       expect(found_rooms).must_be_instance_of Array
       expect(found_rooms.length).must_equal 19
@@ -228,6 +223,22 @@ describe 'reservation_booker' do
 
       expect{reservation_booker.find_totalcost_byreservation(reservation)}.must_raise ArgumentError
     end
+  end
+
+  describe 'book_roomblock' do
+  it 'returns a new instance of book_roomblock given num_rooms, booking_date_range , & discount' do 
+    hotel.add_rooms(5,200)
+
+    room_block = reservation_booker.book_roomblock(5, new_booking_dates , 0.20)
+
+    expect(room_block).must_be_instance_of RoomBlock
+    expect(room_block.booking_date_range).must_equal new_booking_dates
+    expect(room_block.collection_rooms.length).must_equal 5
+    expect(room_block.discount).must_equal 0.20
+  end
+
+  it '' do 
+  end
 
   end
 

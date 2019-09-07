@@ -4,11 +4,12 @@ require_relative 'date_checker'
 
 class ReservationBooker
     
-    attr_accessor :rooms, :reservations
+    attr_accessor :rooms, :reservations, :room_block
 
-    def initialize(rooms = [] , reservations = [])
+    def initialize(rooms = [] , reservations = [], room_blocks = [])
       @rooms = rooms
       @reservations = reservations
+      @room_blocks = room_blocks
     end
 
 # finds the first avaiable room instance given a range of booking dates
@@ -71,16 +72,16 @@ class ReservationBooker
     end
 
 # returns list of avaible rooms on a given date instance    
-    def find_available_rooms_bydate(date)
+    def find_available_rooms_bydates(booking_date_range)
       raise ArgumentError.new("No rooms added yet") if @rooms == []
-      raise ArgumentError.new ("Date input is invalid") if date.class != Date
-
+      raise ArgumentError.new ("Date input is invalid") if booking_date_range[0].class != Date
+        
       found_rooms = []
 
       @rooms.each do |room|
         if room.reservations.empty? 
           found_rooms << room 
-        elsif !room.unavailable_dates.include?(date)
+        elsif (room.unavailable_dates & booking_date_range).empty?
           found_rooms << room 
         end
       end
@@ -99,4 +100,25 @@ class ReservationBooker
       return reservation.price
     end
 
+    def book_roomblock(num_rooms, booking_date_range , discount)
+      collection_rooms = (find_available_rooms_bydates(booking_date_range)).first(num_rooms)
+      
+      room_block = RoomBlock.new(booking_date_range, collection_rooms, discount)
+      @room_blocks << room_block
+
+      collection_rooms.each { |room|
+        room.room_blocks << room_block
+        room.rb_unavailable_dates << booking_date_range
+      }
+      return room_block
+    end
+
 end
+
+# reservation = Reservation.new(avaible_room, booking_date_range)
+# @reservations << reservation
+# avaible_room.reservations << reservation
+# avaible_room.unavailable_dates.concat(booking_date_range)
+# return reservation
+# end
+

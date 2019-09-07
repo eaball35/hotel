@@ -17,11 +17,10 @@ describe 'user stories' do
   describe 'wave 1' do
     it 'I can access the list of all of the rooms in the hotel' do
       hotel.add_rooms(20,200)
-      list_of_room = hotel.rooms
 
-      expect(list_of_room).must_be_instance_of Array
-      expect(list_of_room[0]).must_be_instance_of Room
-      expect(list_of_room.length).must_equal 20
+      expect(hotel.rooms).must_be_instance_of Array
+      expect(hotel.rooms[0]).must_be_instance_of Room
+      expect(hotel.rooms.length).must_equal 20
     end
     it 'I can make a reservation of a room for a given date range' do
       hotel.add_rooms(20,200)
@@ -72,7 +71,7 @@ describe 'user stories' do
     it 'I can view a list of rooms that are not reserved for a given date range, so that I can see all available rooms for that day' do
       hotel.add_rooms(3,200)
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
-      available_rooms = reservation_booker.find_available_rooms_bydate(input_date)
+      available_rooms = reservation_booker.find_available_rooms_bydates(new_booking_dates)
 
       expect(available_rooms[0]).must_be_instance_of Room
       expect(available_rooms.length).must_equal 2
