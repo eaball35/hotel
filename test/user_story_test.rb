@@ -71,7 +71,7 @@ describe 'user stories' do
     it 'I can view a list of rooms that are not reserved for a given date range, so that I can see all available rooms for that day' do
       hotel.add_rooms(3,200)
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
-      available_rooms = reservation_booker.find_available_rooms_bydates(new_booking_dates)
+      available_rooms = reservation_booker.find_available_rooms(new_booking_dates)
 
       expect(available_rooms[0]).must_be_instance_of Room
       expect(available_rooms.length).must_equal 2

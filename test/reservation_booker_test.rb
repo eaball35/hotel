@@ -41,14 +41,14 @@ describe 'reservation_booker' do
       it 'adds new instances of Room with given cost for number of rooms times to @rooms variable' do
         hotel.add_rooms(20,200)
 
-        expect(hotel_rooms[0]).must_be_instance_of Room
+        expect(hotel_rooms.first).must_be_instance_of Room
         expect(hotel_rooms.length).must_equal 20
     end
   end
 
-  describe 'find_first_available_room' do
+  describe 'find_available_rooms' do
     it 'raises error if no rooms added' do
-      expect{reservation_booker.find_first_available_room(new_booking_dates)}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms(new_booking_dates)}.must_raise ArgumentError
     end
 
     it 'returns the first available room, skip room when not available'  do
@@ -56,28 +56,27 @@ describe 'reservation_booker' do
       
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
 
-      available_room2 = reservation_booker.find_first_available_room(new_booking_dates)
+      available_rooms = reservation_booker.find_available_rooms(new_booking_dates)
       
-      expect(available_room2).must_be_instance_of Room
-      expect(available_room2).wont_equal new_reservation.room
+      expect(available_rooms.length).must_equal 1
+      expect(available_rooms).wont_include new_reservation.room
     end
 
-    it 'returns nil if no available rooms for date range' do
+    it 'returns [] if no available rooms for date range' do
       hotel.add_rooms(1,200)
   
       reservation_booker.book_reservation(new_booking_dates)
 
-      available_room2 = reservation_booker.find_first_available_room(new_booking_dates)
-      expect(available_room2).must_be_nil
+      available_rooms = reservation_booker.find_available_rooms(new_booking_dates)
+      expect(available_rooms).must_equal []
     end
 
-    it 'returns first room if hotel has rooms, but no bookings yet' do
+    it 'returns all rooms if hotel has rooms, but no bookings yet' do
       hotel.add_rooms(20,200)
       
-      available_room = reservation_booker.find_first_available_room(new_booking_dates)
+      available_rooms = reservation_booker.find_available_rooms(new_booking_dates)
       
-      expect(available_room).must_be_instance_of Room
-      expect(available_room).must_equal hotel_rooms[0]
+      expect(available_rooms.length).must_equal 20
     end
   
     it 'allows reservation on the same day that another previous reservation ends' do
@@ -96,7 +95,6 @@ describe 'reservation_booker' do
   describe 'book_reservation' do
     it 'raises error if booking dates input is invalid'do
       hotel.add_rooms(1,200)
-      available_room1 = reservation_booker.find_first_available_room(new_booking_dates)
 
       expect{reservation_booker.book_reservation("booking_dates")}.must_raise ArgumentError
       expect{reservation_booker.book_reservation(20)}.must_raise ArgumentError
@@ -177,15 +175,15 @@ describe 'reservation_booker' do
     end
   end
 
-  describe 'find_available_rooms_bydates' do
+  describe 'find_available_rooms' do
     it 'raises error if no rooms added yet' do
-      expect{reservation_booker.find_available_rooms_bydates(new_booking_dates)}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms(new_booking_dates)}.must_raise ArgumentError
     end
 
     it 'raises error if date input is invalid' do
       hotel.add_rooms(2,200)
-      expect{reservation_booker.find_available_rooms_bydates('new_booking_dates')}.must_raise ArgumentError
-      expect{reservation_booker.find_available_rooms_bydates('Apr 1, 2019')}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms('new_booking_dates')}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms('Apr 1, 2019')}.must_raise ArgumentError
     end
     
     it 'finds list of avaible rooms by date, ignoring unavaible rooms' do
@@ -193,11 +191,11 @@ describe 'reservation_booker' do
       
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
 
-      found_rooms = reservation_booker.find_available_rooms_bydates(new_booking_dates)
+      found_rooms = reservation_booker.find_available_rooms(new_booking_dates)
 
       expect(found_rooms).must_be_instance_of Array
       expect(found_rooms.length).must_equal 19
-      expect(found_rooms[0]).must_be_instance_of Room
+      expect(found_rooms.first).must_be_instance_of Room
       expect(found_rooms).wont_include new_reservation.room
     end
   end
@@ -219,26 +217,44 @@ describe 'reservation_booker' do
 
     it 'raises an error if reservation doesnt exist in list of hotel reservations' do
       hotel.add_rooms(1,200)
-      reservation = Reservation.new(hotel_rooms[0], new_booking_dates)
+      reservation = Reservation.new(hotel_rooms.first, new_booking_dates)
 
       expect{reservation_booker.find_totalcost_byreservation(reservation)}.must_raise ArgumentError
     end
   end
 
   describe 'book_roomblock' do
-  it 'returns a new instance of book_roomblock given num_rooms, booking_date_range , & discount' do 
-    hotel.add_rooms(5,200)
+    before do
+      hotel.add_rooms(5,200)
+      @room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+    end
+    it 'returns a new instance of book_roomblock given num_rooms, booking_date_range , & discount' do 
+      expect(@room_block).must_be_instance_of RoomBlock
+      expect(@room_block.booking_date_range).must_equal new_booking_dates
+      expect(@room_block.collection_rooms.length).must_equal 5
+      expect(@room_block.discount).must_equal 20
+    end
 
-    room_block = reservation_booker.book_roomblock(5, new_booking_dates , 0.20)
+    it 'adds new roomblock to list of roomblocks' do 
+      expect(reservation_booker.room_blocks.length).must_equal 1
+      expect(reservation_booker.room_blocks.first).must_equal @room_block
+    end
 
-    expect(room_block).must_be_instance_of RoomBlock
-    expect(room_block.booking_date_range).must_equal new_booking_dates
-    expect(room_block.collection_rooms.length).must_equal 5
-    expect(room_block.discount).must_equal 0.20
-  end
+    it 'adds new roomblock to list of roomblocks for each room in block' do
+      hotel.rooms.each { |room|
+      expect(room.room_blocks.first).must_equal @room_block
+      }
+    end
 
-  it '' do 
-  end
+    it 'adds booking dates to rb_unavailable_dates list for reach room in block' do
+      hotel.rooms.each { |room|
+      expect(room.rb_unavailable_dates).must_equal new_booking_dates
+      }
+    end
+
+    it 'raises error if try to book roomblock when no rooms available' do
+      expect{reservation_booker.book_roomblock(5, new_booking_dates , 20)}.must_raise ArgumentError
+    end
 
   end
 

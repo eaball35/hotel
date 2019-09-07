@@ -4,7 +4,7 @@ require_relative 'date_checker'
 
 class ReservationBooker
     
-    attr_accessor :rooms, :reservations, :room_block
+    attr_accessor :rooms, :reservations, :room_blocks
 
     def initialize(rooms = [] , reservations = [], room_blocks = [])
       @rooms = rooms
@@ -12,45 +12,70 @@ class ReservationBooker
       @room_blocks = room_blocks
     end
 
+    def is_room_roomblocked?(room, booking_date_range)
+      raise ArgumentError.new("Invalid input") if room.class != Room || booking_date_range.class != Array
+      return !(room.rb_unavailable_dates & booking_date_range).empty?
+    end
+
+    def is_room_reserved?(room, booking_date_range)
+      raise ArgumentError.new("Invalid input") if room.class != Room || booking_date_range.class != Array
+      return !(room.unavailable_dates & booking_date_range).empty?
+    end
+
 # finds the first avaiable room instance given a range of booking dates
-    def find_first_available_room(booking_date_range)
+    def find_available_rooms(booking_date_range , include_roombook = true)
       raise ArgumentError.new("No rooms added yet") if @rooms == []
 
+      found_rooms = []
+
       @rooms.each do |room|
-        if room.reservations.empty?
-          return room 
-        elsif (room.unavailable_dates & booking_date_range).empty?
-          return room 
+        no_reservations = room.reservations.empty?
+        roomblocked = is_room_roomblocked?(room , booking_date_range)
+        reserved = is_room_reserved?(room , booking_date_range)
+        
+        if include_roombook
+          found_rooms << room if (no_reservations && !roomblocked) || (!reserved && !roomblocked)
+        else
+          found_rooms << room if no_reservations || !reserved 
         end
-      end
-      return nil
+      end  
+      return found_rooms
     end
 
 # books a new reservation given an available room and booking date range
-# adds the new reservation to list of hotel reservations, the rooms reservations list, & adds the booking dates range to the rooms unavaible dates
+# adds the new reservation to list of hotel reservations, the rooms reservations list, & adds the booking dates range to the rooms unavailable dates
     def book_reservation(booking_date_range)
-      avaible_room = find_first_available_room(booking_date_range)
+      all_available_rooms = find_available_rooms(booking_date_range)
       
-      if avaible_room == nil
-        raise ArgumentError.new("No rooms are available")  
-      elsif avaible_room.class != Room
+      # raise ArgumentError.new("No available rooms") if all_available_rooms == []
+
+      first_available_room = find_available_rooms(booking_date_range).first
+      
+      # if first_available_room == nil
+      #   raise ArgumentError.new("No rooms are available")  
+      if first_available_room.class != Room
         raise ArgumentError.new("Room input isn't valid")
       elsif booking_date_range.class != Array
         raise ArgumentError.new("Booking dates input isn't valid")
-      elsif booking_date_range[0].class != Date
+      elsif booking_date_range.first.class != Date
         raise ArgumentError.new("Booking dates input isn't valid - dates aren't Dates")
       end 
 
-      if avaible_room.unavailable_dates != nil
-        if !(avaible_room.unavailable_dates & booking_date_range).empty?
+      if first_available_room.unavailable_dates != []
+        if !(first_available_room.unavailable_dates & booking_date_range).empty?
           raise ArgumentError.new("Room already booked during these dates")
         end
       end
+
+      if !(booking_date_range & first_available_room.rb_unavailable_dates).empty?
+        raise ArgumentError.new("Room saved for room block ")
+      end
+
       
-      reservation = Reservation.new(avaible_room, booking_date_range)
+      reservation = Reservation.new(first_available_room, booking_date_range)
       @reservations << reservation
-      avaible_room.reservations << reservation
-      avaible_room.unavailable_dates.concat(booking_date_range)
+      first_available_room.reservations << reservation
+      first_available_room.unavailable_dates.concat(booking_date_range)
       return reservation
     end
 
@@ -71,28 +96,6 @@ class ReservationBooker
       return found_reservations
     end
 
-# returns list of avaible rooms on a given date instance    
-    def find_available_rooms_bydates(booking_date_range)
-      raise ArgumentError.new("No rooms added yet") if @rooms == []
-      raise ArgumentError.new ("Date input is invalid") if booking_date_range[0].class != Date
-        
-      found_rooms = []
-
-      @rooms.each do |room|
-        if room.reservations.empty? 
-          found_rooms << room 
-        elsif (room.unavailable_dates & booking_date_range).empty?
-          found_rooms << room 
-        end
-      end
-      
-      if found_rooms.empty?
-        return nil
-      else
-        return found_rooms
-      end
-    end
-
     def find_totalcost_byreservation(reservation)
       raise ArgumentError.new('Invalid reservation input') if reservation.class != Reservation
       raise ArgumentError.new('Not a current reservation') if !@reservations.include?(reservation)
@@ -101,24 +104,25 @@ class ReservationBooker
     end
 
     def book_roomblock(num_rooms, booking_date_range , discount)
-      collection_rooms = (find_available_rooms_bydates(booking_date_range)).first(num_rooms)
+      all_available_rooms = find_available_rooms(booking_date_range)
       
-      room_block = RoomBlock.new(booking_date_range, collection_rooms, discount)
-      @room_blocks << room_block
+      if all_available_rooms == []
+        raise ArgumentError.new("No available rooms") 
+      elsif all_available_rooms.length < num_rooms
+        raise ArgumentError.new("Not enough rooms available for #{num_rooms} size block.") 
+      end
 
-      collection_rooms.each { |room|
+      block_rooms = all_available_rooms.first(num_rooms)
+      room_block = RoomBlock.new(booking_date_range, block_rooms, discount)
+      
+      @room_blocks << room_block
+      block_rooms.each { |room|
         room.room_blocks << room_block
-        room.rb_unavailable_dates << booking_date_range
+        room.rb_unavailable_dates.concat(booking_date_range) 
       }
+      
       return room_block
     end
 
 end
-
-# reservation = Reservation.new(avaible_room, booking_date_range)
-# @reservations << reservation
-# avaible_room.reservations << reservation
-# avaible_room.unavailable_dates.concat(booking_date_range)
-# return reservation
-# end
 
