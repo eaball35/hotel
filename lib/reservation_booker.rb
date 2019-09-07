@@ -102,9 +102,9 @@ class ReservationBooker
 
     def book_roomblock(num_rooms, booking_date_range , discount)
       max_rooms = 5
-      raise ArgumentError.new("num_rooms is invalid") if num_rooms.class != Integer && num_rooms > max_rooms
+      raise ArgumentError.new("num_rooms is invalid") if num_rooms.class != Integer || num_rooms > max_rooms
       raise ArgumentError.new("booking_date_range is invalid") if booking_date_range.class != Array
-      raise ArgumentError.new("discount is invalid")if discount.class != Integer && discount < 0
+      raise ArgumentError.new("discount is invalid")if discount.class != Integer || discount < 0
       
       all_available_rooms = find_available_rooms(booking_date_range)
       

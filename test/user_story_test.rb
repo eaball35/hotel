@@ -93,7 +93,55 @@ describe 'user stories' do
 
       expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise ArgumentError
     end
+  end
 
+  describe 'wave 3' do
+    it 'I can create a Hotel Block if I give a date range, collection of rooms, and a discounted room rate' do
+      hotel.add_rooms(20,200)
+      new_room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      
+      expect(new_room_block).must_be_instance_of RoomBlock
+  
+      expect(new_room_block.booking_date_range).must_equal new_booking_dates
+      
+      expect(new_room_block.collection_rooms.length).must_equal 5
+      expect(new_room_block.collection_rooms.first).must_be_instance_of Room
+
+      expect(new_room_block.discount).must_equal 20
+    end
+    
+    it 'I want an exception raised if I try to create a Hotel Block and at least one of the rooms is unavailable for the given date range' do
+      hotel.add_rooms(5,200)
+      new_reservation = reservation_booker.book_reservation(new_booking_dates)
+      
+      expect{reservation_booker.book_roomblock(5, new_booking_dates , 20)}.must_raise ArgumentError
+    end
+    
+    it 'Given a specific date, and that a room is set aside in a hotel block for that specific date, I cannot reserve that specific room for that specific date, because it is unavailable' do
+      hotel.add_rooms(5,200)
+      new_room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      
+      expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise ArgumentError
+    end
+    
+    it 'Given a specific date, and that a room is set aside in a hotel block for that specific date, I cannot create another hotel block that includes that specific room for that specific date, because it is unavailable' do
+      hotel.add_rooms(5,200)
+      new_room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      
+      expect{reservation_booker.book_roomblock(3, new_booking_dates , 20)}.must_raise ArgumentError
+    end
+    
+    it 'I can check whether a given block has any rooms available' do
+    end
+    
+    it 'I can reserve a specific room from a hotel block' do
+    end
+    
+    it 'I can only reserve that room from a hotel block for the full duration of the block' do
+    end
+    
+    it 'I can see a reservation made from a hotel block from the list of reservations for that date (see wave 1 requirements)' do
+    end
   end
 
 end
