@@ -44,15 +44,12 @@ class ReservationBooker
 
 # books a new reservation given an available room and booking date range
 # adds the new reservation to list of hotel reservations, the rooms reservations list, & adds the booking dates range to the rooms unavailable dates
-    def book_reservation(booking_date_range)
-      all_available_rooms = find_available_rooms(booking_date_range)
-      
-      # raise ArgumentError.new("No available rooms") if all_available_rooms == []
+    def book_reservation(booking_date_range, include_roombook = true)
+      all_available_rooms = find_available_rooms(booking_date_range, include_roombook)      
+      raise ArgumentError.new("No available rooms") if all_available_rooms == []
 
-      first_available_room = find_available_rooms(booking_date_range).first
+      first_available_room = all_available_rooms.first
       
-      # if first_available_room == nil
-      #   raise ArgumentError.new("No rooms are available")  
       if first_available_room.class != Room
         raise ArgumentError.new("Room input isn't valid")
       elsif booking_date_range.class != Array
@@ -104,6 +101,11 @@ class ReservationBooker
     end
 
     def book_roomblock(num_rooms, booking_date_range , discount)
+      max_rooms = 5
+      raise ArgumentError.new("num_rooms is invalid") if num_rooms.class != Integer && num_rooms > max_rooms
+      raise ArgumentError.new("booking_date_range is invalid") if booking_date_range.class != Array
+      raise ArgumentError.new("discount is invalid")if discount.class != Integer && discount < 0
+      
       all_available_rooms = find_available_rooms(booking_date_range)
       
       if all_available_rooms == []

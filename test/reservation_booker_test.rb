@@ -256,6 +256,22 @@ describe 'reservation_booker' do
       expect{reservation_booker.book_roomblock(5, new_booking_dates , 20)}.must_raise ArgumentError
     end
 
-  end
+    it 'raises error if try to book a regular reservation when room has roomblock during date range' do
+      expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise ArgumentError
+    end
 
+    it 'raises error if try to book another roomblock overlapping current roomblock' do
+      new_dates = DateChecker.new('Apr, 3 2019', 'Apr, 6 2019').booking_date_range
+      expect{reservation_booker.book_roomblock(5, new_dates , 20)}.must_raise ArgumentError
+    end
+
+    it 'raises error if try to book roomblock with more than 5 rooms' do
+      new_dates = DateChecker.new('May, 1 2019', 'May, 4 2019').booking_date_range
+      expect{reservation_booker.book_roomblock(10, new_dates , 20)}.must_raise ArgumentError
+      expect{reservation_booker.book_roomblock(15, new_dates , 20)}.must_raise ArgumentError
+      expect{reservation_booker.book_roomblock(6, new_dates , 20)}.must_raise ArgumentError
+    end
+
+  
+  end
 end
