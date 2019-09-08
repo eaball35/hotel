@@ -67,7 +67,7 @@ class ReservationBooker
       return room_block.collection_rooms - room_block.reserved_rooms
     end
 
-    def book_roomblock_reservation(room_block, num_rooms = 1)
+    def book_roomblock_reservation(room_block:, num_rooms: 1)
       check_room_block?(room_block)
       check_num?(num_rooms)
 
@@ -81,7 +81,7 @@ class ReservationBooker
       reservations = []
       
       reservation_rooms.each do |available_room|
-        reservations << book_reservation(booking_date_range, true, available_room, discount)
+        reservations << book_reservation(booking_date_range: booking_date_range, roomblock: true, available_room: available_room, discount: discount)
         room_block.reserved_rooms << available_room
       end
       
@@ -89,7 +89,7 @@ class ReservationBooker
       return reservations
     end
 
-    def book_reservation(booking_date_range, roomblock = false, available_room = nil, discount = 0)
+    def book_reservation(booking_date_range:, roomblock: false, available_room: nil, discount: 0)
       check_booking_date_range?(booking_date_range)
       check_num?(discount)
       check_roomblock?(roomblock)

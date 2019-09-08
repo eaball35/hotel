@@ -18,9 +18,9 @@ describe 'room_block_booker' do
     }
   let (:collection_rooms)  {
     hotel.add_rooms(num_rooms: 3, cost: 200)
-    reservation_booker.book_reservation(new_booking_dates)
-    reservation_booker.book_reservation(new_booking_dates)
-    reservation_booker.book_reservation(new_booking_dates)
+    reservation_booker.book_reservation(booking_date_range: new_booking_dates)
+    reservation_booker.book_reservation(booking_date_range: new_booking_dates)
+    reservation_booker.book_reservation(booking_date_range: new_booking_dates)
     [hotel.rooms[0],hotel.rooms[1],hotel.rooms[2]]
   }
 
