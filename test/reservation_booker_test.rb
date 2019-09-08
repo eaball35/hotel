@@ -15,7 +15,7 @@ describe 'reservation_booker' do
     hotel.reservation_booker.reservations
   }
   let (:new_booking_dates)  {
-    DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+    BookingDates.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
   }
 
     describe 'initialize' do
@@ -25,26 +25,6 @@ describe 'reservation_booker' do
           expect(hotel_reservations).must_equal []
       end
     end
-
-    describe 'add_rooms' do
-    
-      it 'raise error if num_rooms is invalid' do
-        expect{hotel.add_rooms("45",200)}.must_raise StandardError
-        expect{hotel.add_rooms([],200)}.must_raise StandardError
-      end
-
-      it 'raise error if cost is invalid' do    
-        expect{hotel.add_rooms(2,"200")}.must_raise StandardError
-        expect{hotel.add_rooms([2],[200])}.must_raise StandardError
-      end
-
-      it 'adds new instances of Room with given cost for number of rooms times to @rooms variable' do
-        hotel.add_rooms(20,200)
-
-        expect(hotel_rooms.first).must_be_instance_of Room
-        expect(hotel_rooms.length).must_equal 20
-    end
-  end
 
   describe 'find_available_rooms' do
     it 'raises error if no rooms added' do
@@ -81,7 +61,7 @@ describe 'reservation_booker' do
   
     it 'allows reservation on the same day that another previous reservation ends' do
       hotel.add_rooms(1,200)
-      new_booking_dates2 = DateChecker.new('Apr, 4 2019', 'Apr, 7 2019').booking_date_range
+      new_booking_dates2 = BookingDates.new('Apr, 4 2019', 'Apr, 7 2019').booking_date_range
       
       reservation1 = reservation_booker.book_reservation(new_booking_dates)
       reservation2 = reservation_booker.book_reservation(new_booking_dates2)
@@ -93,22 +73,20 @@ describe 'reservation_booker' do
   end
 
   describe 'book_reservation' do
-    it 'raises error if booking dates input is invalid'do
+    before do
       hotel.add_rooms(1,200)
-
+    end
+    it 'raises error if booking dates input is invalid'do
       expect{reservation_booker.book_reservation("booking_dates")}.must_raise StandardError
       expect{reservation_booker.book_reservation(20)}.must_raise StandardError
       expect{reservation_booker.book_reservation(nil)}.must_raise StandardError
     end
 
     it 'raises error if booking dates input not contains Dates' do
-      hotel.add_rooms(1,200)
-
       expect{reservation_booker.book_reservation(['Apr, 1 2019', 'Apr, 4 2019'])}.must_raise StandardError
     end
 
     it 'returns new reservation given booking dates' do
-      hotel.add_rooms(1,200)
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
 
       expect(new_reservation).must_be_instance_of Reservation
@@ -117,8 +95,7 @@ describe 'reservation_booker' do
     end
 
     it 'new reservation should be added to rooms list of reservations' do
-      hotel.add_rooms(1,200)
-      new_booking_dates2 = DateChecker.new('Apr, 6 2019', 'Apr, 10 2019').booking_date_range
+      new_booking_dates2 = BookingDates.new('Apr, 6 2019', 'Apr, 10 2019').booking_date_range
       
       reservation1 = reservation_booker.book_reservation(new_booking_dates)
       reservation2 = reservation_booker.book_reservation(new_booking_dates2)
@@ -129,16 +106,12 @@ describe 'reservation_booker' do
     end
 
     it 'new reservation booking dates should be added to rooms unavailable dates' do
-      hotel.add_rooms(1,200)
-      
       new_reservation = reservation_booker.book_reservation(new_booking_dates)
 
       expect(new_reservation.room.unavailable_dates).must_equal new_booking_dates
     end
 
     it 'raises error if inputed room already has reservation on inputed dates' do
-      hotel.add_rooms(1,200)
-      
       reservation_booker.book_reservation(new_booking_dates)
       
       expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise StandardError
@@ -219,6 +192,14 @@ describe 'reservation_booker' do
 
       expect{reservation_booker.find_totalcost_byreservation(reservation)}.must_raise StandardError
     end
+
+    it 'returns price correctly for discounted rooms' do
+      hotel.add_rooms(5,200)
+      room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      
+      reservation = reservation_booker.book_roomblock_reservation(room_block)
+      expect(reservation.price).must_equal 480
+    end
   end
 
   describe 'book_roomblock' do
@@ -226,6 +207,7 @@ describe 'reservation_booker' do
       hotel.add_rooms(5,200)
       @room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
     end
+    
     it 'returns a new instance of book_roomblock given num_rooms, booking_date_range , & discount' do 
       expect(@room_block).must_be_instance_of RoomBlock
       expect(@room_block.booking_date_range).must_equal new_booking_dates
@@ -259,12 +241,12 @@ describe 'reservation_booker' do
     end
 
     it 'raises error if try to book another roomblock overlapping current roomblock' do
-      new_dates = DateChecker.new('Apr, 3 2019', 'Apr, 6 2019').booking_date_range
+      new_dates = BookingDates.new('Apr, 3 2019', 'Apr, 6 2019').booking_date_range
       expect{reservation_booker.book_roomblock(5, new_dates , 20)}.must_raise StandardError
     end
 
     it 'raises error if try to book roomblock with more than 5 rooms' do
-      new_dates = DateChecker.new('May, 1 2019', 'May, 4 2019').booking_date_range
+      new_dates = BookingDates.new('May, 1 2019', 'May, 4 2019').booking_date_range
       expect{reservation_booker.book_roomblock(10, new_dates , 20)}.must_raise StandardError
       expect{reservation_booker.book_roomblock(15, new_dates , 20)}.must_raise StandardError
       expect{reservation_booker.book_roomblock(6, new_dates , 20)}.must_raise StandardError
@@ -282,7 +264,10 @@ describe 'reservation_booker' do
       expect(@reservations.length).must_equal 2
       expect(@reservations.first).must_be_instance_of Reservation
       expect(@reservations.first.booking_date_range).must_equal new_booking_dates
-      expect(@reservations.first.booking_date_range).must_equal new_booking_dates      
+      expect(@reservations.first.booking_date_range).must_equal new_booking_dates   
+    end
+    
+    it 'cannot book more rooms than are available in room block' do
     end
 
   end

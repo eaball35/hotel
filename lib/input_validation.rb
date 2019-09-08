@@ -3,7 +3,7 @@ end
 class EmptyError < StandardError
 end
 
-def check_booking_date_range(booking_date_range)
+def check_booking_date_range?(booking_date_range)
   if booking_date_range == nil
     raise NilError.new("Nil booking_date_range")
   elsif booking_date_range.class != Array || booking_date_range.empty?
@@ -13,7 +13,7 @@ def check_booking_date_range(booking_date_range)
   end 
 end
 
-def check_room(room)
+def check_room?(room)
   if room == nil
     raise NilError.new("Nil room")
   elsif room.class != Room
@@ -21,7 +21,7 @@ def check_room(room)
   end
 end
 
-def check_roomblock(roomblock)
+def check_roomblock?(roomblock)
   if roomblock == nil
     raise NilError.new("Nil roomblock")
   elsif roomblock != true && roomblock != false
@@ -29,7 +29,7 @@ def check_roomblock(roomblock)
   end
 end
 
-def check_room_block(room_block)
+def check_room_block?(room_block)
   if room_block == nil
     raise NilError.new("Nil room_block")
   elsif room_block.class != RoomBlock
@@ -37,7 +37,7 @@ def check_room_block(room_block)
   end
 end
 
-def check_empty(array)
+def check_empty?(array)
   if array == nil
     raise NilError.new("Nil rooms")
   elsif array.class != Array
@@ -47,15 +47,15 @@ def check_empty(array)
   end
 end
 
-def check_num(num)
+def check_num?(num)
   if num == nil
     raise NilError.new("Nil discount")
-  elsif num.class != Integer && num.class != Float && integer < 0
+  elsif num.class != Integer && num.class != Float && num < 0
     raise TypeError.new("Invalid roomblock")
   end
 end
 
-def check_date(date)
+def check_date?(date)
   if date == nil
     raise NilError.new("Nil date")
   elsif date.class != Date
@@ -63,7 +63,7 @@ def check_date(date)
   end
 end
 
-def check_reservation(reservation)
+def check_reservation?(reservation)
   if reservation == nil
     raise NilError.new("Nil date")
   elsif reservation.class != Reservation
@@ -71,6 +71,18 @@ def check_reservation(reservation)
   end
 end
 
-def room_reserved?(room, booking_date_range)
+def check_room_reserved?(room, booking_date_range)
   raise EmptyError.new("Room reserved") if !(room.unavailable_dates & booking_date_range).empty?
+end
+
+def check_enough_available?(array, number)
+  raise EmptyError.new("Not enough available.") if array.length < number
+end
+
+def check_nil(input)
+  raise NilError.new("Nil input") if input == nil
+end
+
+def check_end_after_start(start_date, end_date)
+  raise ArgumentError.new("Invalid date inputs") if end_date < start_date
 end

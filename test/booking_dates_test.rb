@@ -1,10 +1,10 @@
 require_relative 'test_helper'
 require 'date'
 
-describe 'date_checker tests' do
+describe 'booking_dates' do
 
     let (:date1)  {
-        DateChecker.new("Jan 1, 2019", "Jan 4, 2019")
+        BookingDates.new("Jan 1, 2019", "Jan 4, 2019")
       }
     let (:start1)  {
         date1.start_date
@@ -17,12 +17,12 @@ describe 'date_checker tests' do
     }
 
     it 'should raise error if end date or start date are nil' do
-        expect{DateChecker.new(nil, "Jan 4, 2019")}.must_raise StandardError
-        expect{DateChecker.new("Jan 1, 2019", nil)}.must_raise StandardError
+        expect{BookingDates.new(nil, "Jan 4, 2019")}.must_raise StandardError
+        expect{BookingDates.new("Jan 1, 2019", nil)}.must_raise StandardError
     end
 
     it 'should raise error if end date is before start date' do
-        expect{DateChecker.new("Jan 14, 2019", "Jan 4, 2019")}.must_raise StandardError
+        expect{BookingDates.new("Jan 14, 2019", "Jan 4, 2019")}.must_raise StandardError
     end
 
     it 'instance end and start date variables should be instance of Time' do

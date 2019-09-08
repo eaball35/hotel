@@ -10,7 +10,7 @@ Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 require_relative '../lib/hotel'
 require_relative '../lib/room'
-require_relative '../lib/date_checker'
+require_relative '../lib/booking_dates'
 require_relative '../lib/reservation'
 require_relative '../lib/reservation_booker'
 require_relative '../lib/room_block'

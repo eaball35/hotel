@@ -8,7 +8,7 @@ describe 'room_block_booker' do
     hotel.reservation_booker
     }
   let (:new_booking_dates)  {
-      DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      BookingDates.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
     }
   let (:input_date)  {
       Date.parse('Apr, 2 2019')

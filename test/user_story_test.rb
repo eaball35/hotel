@@ -8,7 +8,7 @@ describe 'user stories' do
     hotel.reservation_booker
     }
   let (:new_booking_dates)  {
-      DateChecker.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
+      BookingDates.new('Apr, 1 2019', 'Apr, 4 2019').booking_date_range
     }
   let (:input_date)  {
       Date.parse('Apr, 2 2019')
@@ -57,8 +57,8 @@ describe 'user stories' do
     end
     
     it 'I want exception raised when an invalid date range is provided, so that I cant make a reservation for an invalid date range' do
-      expect{DateChecker.new(nil, nil)}.must_raise StandardError
-      expect{DateChecker.new('45', 'date')}.must_raise StandardError
+      expect{BookingDates.new(nil, nil)}.must_raise StandardError
+      expect{BookingDates.new('45', 'date')}.must_raise StandardError
 
       hotel.add_rooms(1,200)
       expect{reservation_booker.book_reservation('booking_date_range')}.must_raise StandardError

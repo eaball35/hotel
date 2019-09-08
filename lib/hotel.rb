@@ -7,8 +7,8 @@ class Hotel
   attr_accessor :rooms
     
   def initialize(num_rooms = 0, cost = 0)
-    check_num(num_rooms)
-    check_num(cost)
+    check_num?(num_rooms)
+    check_num?(cost)
 
     @rooms = []
     @cost = cost
@@ -21,8 +21,8 @@ class Hotel
     # adds additional rooms to booker - input number of new rooms and cost per room
   
   def add_rooms(num_rooms,cost)
-    check_num(num_rooms)
-    check_num(cost)
+    check_num?(num_rooms)
+    check_num?(cost)
 
     num_rooms.times do
       new_room = Room.new(cost)

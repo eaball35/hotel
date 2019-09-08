@@ -3,7 +3,7 @@ require_relative 'test_helper'
 describe 'reservation tests' do
   
   let (:booking_dates)  {
-    DateChecker.new('Jan, 1, 2019', 'Jan 4, 2019').booking_date_range 
+    BookingDates.new('Jan, 1, 2019', 'Jan 4, 2019').booking_date_range 
   }
   let (:room)  {
     Room.new(200) 
