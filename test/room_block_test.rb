@@ -36,6 +36,6 @@ describe 'room_block_booker' do
     end
 
     it 'raises error if any room in block is already booked during booking date range' do
-      expect{RoomBlock.new(new_booking_dates, collection_rooms, discount)}.must_raise ArgumentError
+      expect{RoomBlock.new(new_booking_dates, collection_rooms, discount)}.must_raise StandardError
     end
 end

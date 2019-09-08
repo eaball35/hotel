@@ -12,7 +12,7 @@ describe 'room tests' do
   end
 
   it 'should raise error if cost input is invalid'do
-  expect{Room.new('200')}.must_raise ArgumentError
-  expect{Room.new()}.must_raise ArgumentError
+  expect{Room.new('200')}.must_raise StandardError
+  expect{Room.new()}.must_raise StandardError
   end
 end

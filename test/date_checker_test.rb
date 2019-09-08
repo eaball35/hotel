@@ -17,12 +17,12 @@ describe 'date_checker tests' do
     }
 
     it 'should raise error if end date or start date are nil' do
-        expect{DateChecker.new(nil, "Jan 4, 2019")}.must_raise ArgumentError
-        expect{DateChecker.new("Jan 1, 2019", nil)}.must_raise ArgumentError
+        expect{DateChecker.new(nil, "Jan 4, 2019")}.must_raise StandardError
+        expect{DateChecker.new("Jan 1, 2019", nil)}.must_raise StandardError
     end
 
     it 'should raise error if end date is before start date' do
-        expect{DateChecker.new("Jan 14, 2019", "Jan 4, 2019")}.must_raise ArgumentError
+        expect{DateChecker.new("Jan 14, 2019", "Jan 4, 2019")}.must_raise StandardError
     end
 
     it 'instance end and start date variables should be instance of Time' do

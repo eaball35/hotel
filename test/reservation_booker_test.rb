@@ -29,13 +29,13 @@ describe 'reservation_booker' do
     describe 'add_rooms' do
     
       it 'raise error if num_rooms is invalid' do
-        expect{hotel.add_rooms("45",200)}.must_raise ArgumentError
-        expect{hotel.add_rooms([],200)}.must_raise ArgumentError
+        expect{hotel.add_rooms("45",200)}.must_raise StandardError
+        expect{hotel.add_rooms([],200)}.must_raise StandardError
       end
 
       it 'raise error if cost is invalid' do    
-        expect{hotel.add_rooms(2,"200")}.must_raise ArgumentError
-        expect{hotel.add_rooms([2],[200])}.must_raise ArgumentError
+        expect{hotel.add_rooms(2,"200")}.must_raise StandardError
+        expect{hotel.add_rooms([2],[200])}.must_raise StandardError
       end
 
       it 'adds new instances of Room with given cost for number of rooms times to @rooms variable' do
@@ -48,7 +48,7 @@ describe 'reservation_booker' do
 
   describe 'find_available_rooms' do
     it 'raises error if no rooms added' do
-      expect{reservation_booker.find_available_rooms(new_booking_dates)}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms(new_booking_dates)}.must_raise StandardError
     end
 
     it 'returns the first available room, skip room when not available'  do
@@ -96,15 +96,15 @@ describe 'reservation_booker' do
     it 'raises error if booking dates input is invalid'do
       hotel.add_rooms(1,200)
 
-      expect{reservation_booker.book_reservation("booking_dates")}.must_raise ArgumentError
-      expect{reservation_booker.book_reservation(20)}.must_raise ArgumentError
-      expect{reservation_booker.book_reservation(nil)}.must_raise ArgumentError
+      expect{reservation_booker.book_reservation("booking_dates")}.must_raise StandardError
+      expect{reservation_booker.book_reservation(20)}.must_raise StandardError
+      expect{reservation_booker.book_reservation(nil)}.must_raise StandardError
     end
 
     it 'raises error if booking dates input not contains Dates' do
       hotel.add_rooms(1,200)
 
-      expect{reservation_booker.book_reservation(['Apr, 1 2019', 'Apr, 4 2019'])}.must_raise ArgumentError
+      expect{reservation_booker.book_reservation(['Apr, 1 2019', 'Apr, 4 2019'])}.must_raise StandardError
     end
 
     it 'returns new reservation given booking dates' do
@@ -141,7 +141,7 @@ describe 'reservation_booker' do
       
       reservation_booker.book_reservation(new_booking_dates)
       
-      expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise ArgumentError
+      expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise StandardError
     end
   end
 
@@ -169,21 +169,21 @@ describe 'reservation_booker' do
     end
 
     it 'raises error if date input is invalid' do
-      expect{reservation_booker.find_reservations_bydate('Apr, 1 2019')}.must_raise ArgumentError
-      expect{reservation_booker.find_reservations_bydate(20)}.must_raise ArgumentError
-      expect{reservation_booker.find_reservations_bydate(nil)}.must_raise ArgumentError
+      expect{reservation_booker.find_reservations_bydate('Apr, 1 2019')}.must_raise StandardError
+      expect{reservation_booker.find_reservations_bydate(20)}.must_raise StandardError
+      expect{reservation_booker.find_reservations_bydate(nil)}.must_raise StandardError
     end
   end
 
   describe 'find_available_rooms' do
     it 'raises error if no rooms added yet' do
-      expect{reservation_booker.find_available_rooms(new_booking_dates)}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms(new_booking_dates)}.must_raise StandardError
     end
 
     it 'raises error if date input is invalid' do
       hotel.add_rooms(2,200)
-      expect{reservation_booker.find_available_rooms('new_booking_dates')}.must_raise ArgumentError
-      expect{reservation_booker.find_available_rooms('Apr 1, 2019')}.must_raise ArgumentError
+      expect{reservation_booker.find_available_rooms('new_booking_dates')}.must_raise StandardError
+      expect{reservation_booker.find_available_rooms('Apr 1, 2019')}.must_raise StandardError
     end
     
     it 'finds list of avaible rooms by date, ignoring unavaible rooms' do
@@ -211,15 +211,15 @@ describe 'reservation_booker' do
     end
 
     it 'raises an error if reservation is invalid' do
-      expect{reservation_booker.find_totalcost_byreservation('reservation')}.must_raise ArgumentError
-      expect{reservation_booker.find_totalcost_byreservation(nil)}.must_raise ArgumentError
+      expect{reservation_booker.find_totalcost_byreservation('reservation')}.must_raise StandardError
+      expect{reservation_booker.find_totalcost_byreservation(nil)}.must_raise StandardError
     end
 
     it 'raises an error if reservation doesnt exist in list of hotel reservations' do
       hotel.add_rooms(1,200)
       reservation = Reservation.new(hotel_rooms.first, new_booking_dates)
 
-      expect{reservation_booker.find_totalcost_byreservation(reservation)}.must_raise ArgumentError
+      expect{reservation_booker.find_totalcost_byreservation(reservation)}.must_raise StandardError
     end
   end
 
@@ -253,25 +253,41 @@ describe 'reservation_booker' do
     end
 
     it 'raises error if try to book roomblock when no rooms available' do
-      expect{reservation_booker.book_roomblock(5, new_booking_dates , 20)}.must_raise ArgumentError
+      expect{reservation_booker.book_roomblock(5, new_booking_dates , 20)}.must_raise StandardError
     end
 
     it 'raises error if try to book a regular reservation when room has roomblock during date range' do
-      expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise ArgumentError
+      expect{reservation_booker.book_reservation(new_booking_dates)}.must_raise StandardError
     end
 
     it 'raises error if try to book another roomblock overlapping current roomblock' do
       new_dates = DateChecker.new('Apr, 3 2019', 'Apr, 6 2019').booking_date_range
-      expect{reservation_booker.book_roomblock(5, new_dates , 20)}.must_raise ArgumentError
+      expect{reservation_booker.book_roomblock(5, new_dates , 20)}.must_raise StandardError
     end
 
     it 'raises error if try to book roomblock with more than 5 rooms' do
       new_dates = DateChecker.new('May, 1 2019', 'May, 4 2019').booking_date_range
-      expect{reservation_booker.book_roomblock(10, new_dates , 20)}.must_raise ArgumentError
-      expect{reservation_booker.book_roomblock(15, new_dates , 20)}.must_raise ArgumentError
-      expect{reservation_booker.book_roomblock(6, new_dates , 20)}.must_raise ArgumentError
+      expect{reservation_booker.book_roomblock(10, new_dates , 20)}.must_raise StandardError
+      expect{reservation_booker.book_roomblock(15, new_dates , 20)}.must_raise StandardError
+      expect{reservation_booker.book_roomblock(6, new_dates , 20)}.must_raise StandardError
+    end
+  end
+
+  describe 'book_roomblock_reservation' do
+    before do
+      hotel.add_rooms(20,200)
+      @room_block = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      @reservations = reservation_booker.book_roomblock_reservation(@room_block, 2)
+    end
+    it 'books a reservation from roomblock' do
+      expect(@reservations).must_be_instance_of Array
+      expect(@reservations.length).must_equal 2
+      expect(@reservations.first).must_be_instance_of Reservation
+      expect(@reservations.first.booking_date_range).must_equal new_booking_dates
+      expect(@reservations.first.booking_date_range).must_equal new_booking_dates      
     end
 
-  
   end
+
+
 end

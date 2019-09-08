@@ -7,7 +7,7 @@ class Room
     if cost.class == Integer || cost.class == Float
       @cost = cost
     else
-      raise ArgumentError.new("Invalid cost input")
+      raise TypeError.new("Invalid cost input")
     end
 
     @reservations = reservations
