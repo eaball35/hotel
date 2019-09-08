@@ -132,7 +132,15 @@ describe 'user stories' do
     end
     
     it 'I can check whether a given block has any rooms available' do
+      hotel.add_rooms(5,200)
+      new_roomblock = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      new_reservation = reservation_booker.book_roomblock_reservation(new_roomblock)
+      available_rooms = reservation_booker.find_available_rooms_in_roomblock(new_roomblock)
 
+      expect(new_roomblock.reserved_rooms.length).must_equal 1
+      expect(available_rooms.length).must_equal 4
+      expect(available_rooms.first).must_be_instance_of Room
+      expect(available_rooms).wont_include new_reservation.room
     end
     
     it 'I can reserve a specific room from a hotel block' do
@@ -145,9 +153,25 @@ describe 'user stories' do
     end
     
     it 'I can only reserve that room from a hotel block for the full duration of the block' do
+      hotel.add_rooms(5,200)
+      new_roomblock = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+
+      partial_stay = BookingDates.new('Apr, 2 2019', 'Apr, 4 2019').booking_date_range
+      expect{reservation_booker.book_reservation(partial_stay)}.must_raise StandardError
+
+      new_reservation = reservation_booker.book_roomblock_reservation(new_roomblock)
+      expect(new_reservation).must_be_instance_of Reservation
+      expect(new_reservation.booking_date_range).must_equal new_booking_dates
     end
     
     it 'I can see a reservation made from a hotel block from the list of reservations for that date (see wave 1 requirements)' do
+      hotel.add_rooms(5,200)
+      new_roomblock = reservation_booker.book_roomblock(5, new_booking_dates , 20)
+      new_reservation1 = reservation_booker.book_roomblock_reservation(new_roomblock)
+      new_reservation2 = reservation_booker.book_roomblock_reservation(new_roomblock)
+
+      expect(reservation_booker.reservations).must_include new_reservation1
+      expect(reservation_booker.reservations).must_include new_reservation2
     end
   end
 
