@@ -1,12 +1,10 @@
+require_relative 'input_validation'
 require_relative 'room'
 require_relative 'reservation'
 require_relative 'date_checker'
 
+
 class ReservationBooker
-  class NilError < StandardError
-  end
-  class EmptyError < StandardError
-  end
 
     attr_accessor :rooms, :reservations, :room_blocks
 
@@ -16,66 +14,13 @@ class ReservationBooker
       @room_blocks = room_blocks
     end
 
-    def check_booking_date_range(booking_date_range)
-      if booking_date_range == nil
-        raise NilError.new("Nil booking_date_range")
-      elsif booking_date_range.class != Array || booking_date_range.empty?
-        raise TypeError.new("Invalid booking_date_range")
-      elsif booking_date_range.first.class != Date
-        raise TypeError.new("Invalid booking_date_range - incorrect dates")
-      end 
-    end
-
-    def check_room(room)
-      if room == nil
-        raise NilError.new("Nil room")
-      elsif room.class != Room
-        raise TypeError.new("Invalid room")
-      end
-    end
-
-    def check_roomblock(roomblock)
-      if roomblock == nil
-        raise NilError.new("Nil roomblock")
-      elsif roomblock != true && roomblock != false
-        raise TypeError.new("Invalid roomblock")
-      end
-    end
-
-    def check_room_block(room_block)
-      if room_block == nil
-        raise NilError.new("Nil room_block")
-      elsif room_block.class != RoomBlock
-        raise TypeError.new("Invalid room_block")
-      end
-    end
-
-    def check_no_rooms(rooms)
-      if rooms == nil
-        raise NilError.new("Nil rooms")
-      elsif rooms.class != Array
-        raise TypeError.new("Invalid rooms")
-      elsif rooms.empty?
-        raise EmptyError.new("No rooms")
-      end
-    end
-
-    def check_num(num)
-      if num == nil
-        raise NilError.new("Nil discount")
-      elsif num.class != Integer && num.class != Float && integer < 0
-        raise TypeError.new("Invalid roomblock")
-      end
-    end
-
-
     def is_room_roomblocked?(room, booking_date_range)
       check_room(room)
       check_booking_date_range(booking_date_range)
       
       return !(room.rb_unavailable_dates & booking_date_range).empty?
     end
-
+    
     def is_room_reserved?(room, booking_date_range)
       check_room(room)
       check_booking_date_range(booking_date_range)
@@ -87,7 +32,7 @@ class ReservationBooker
     def find_available_rooms(booking_date_range , roomblock = false)
       check_booking_date_range(booking_date_range)
       check_roomblock(roomblock)
-      check_no_rooms(@rooms)
+      check_empty(@rooms)
 
       found_rooms = []
       @rooms.each do |room|
@@ -110,7 +55,7 @@ class ReservationBooker
       check_roomblock(roomblock)
       
       all_available_rooms = find_available_rooms(booking_date_range, roomblock) 
-      check_no_rooms(all_available_rooms)
+      check_empty(all_available_rooms)
 
       first_available_room = all_available_rooms.first
       check_room(first_available_room)
@@ -156,8 +101,8 @@ class ReservationBooker
 
   # returns list of reservations on a given date instance
     def find_reservations_bydate(date)
-      raise TypeError.new("invalid input date") if date.class != Date
-      return nil if @reservations.empty?
+      check_date(date)
+      check_empty(@reservations)
 
       found_reservations = []
       @reservations.each do |reservation|
@@ -172,9 +117,9 @@ class ReservationBooker
     end
 
     def find_totalcost_byreservation(reservation)
-      raise TypeError.new('Invalid reservation input') if reservation.class != Reservation
+      check_reservation(reservation)
+      check_empty(@reservations)
       raise EmptyError.new('Not a current reservation') if !@reservations.include?(reservation)
-      check_no_rooms(@reservations)
 
       return reservation.price
     end
@@ -187,8 +132,7 @@ class ReservationBooker
       check_num(discount)
 
       all_available_rooms = find_available_rooms(booking_date_range)
-      
-      check_no_rooms(all_available_rooms)
+      check_empty(all_available_rooms)
       raise EmptyError.new("Not enough rooms available.") if all_available_rooms.length < num_rooms
 
       block_rooms = all_available_rooms.first(num_rooms)

@@ -162,10 +162,8 @@ describe 'reservation_booker' do
         expect(reservations_on_date).must_include reservation2
     end
 
-    it 'returns nil if there are no reservations yet' do
-      reservations_on_date = reservation_booker.find_reservations_bydate(input_date)
-
-      expect(reservations_on_date).must_be_nil
+    it 'raises error if there are no reservations yet' do
+      expect{reservation_booker.find_reservations_bydate(input_date)}.must_raise StandardError
     end
 
     it 'raises error if date input is invalid' do
