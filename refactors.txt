@@ -1,0 +1,22 @@
+- Read and write database for each piece of data that system is storing
+
+- CLI to interact with booking system
+
+- Include more functionality for the hotel class - what other things might hotel want to do (give out keys, reserve conference rooms, store employee information, etc.)
+
+- More testing around edge cases
+
+- Better testing - more examples used when testing/generate random data each run
+
+- More efficient searching
+
+- Smaller methods
+
+- Breaking out booking room block into its own class
+
+- Futher consideration for edge cases
+
+- Use modules as a namespace
+
+- Abstract naming so can better be used for more purposes than hotel
+

@@ -3,7 +3,7 @@ require_relative 'input_validation'
 class Reservation
   attr_reader :room, :booking_date_range, :price, :discount
   
-  def initialize(room, booking_date_range, discount = 0)
+  def initialize(room:, booking_date_range:, discount: 0)
     check_room?(room)
     check_booking_date_range?(booking_date_range)
     check_num?(discount)
